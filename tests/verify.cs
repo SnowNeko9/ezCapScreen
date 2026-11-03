@@ -801,6 +801,82 @@ static class Verify
             using (var image = ClipboardImage())
                 Check(image != null && image.Width == 300 && MatchesPattern(image, 900, 200), "replacing the selection drops the note");
 
+            // Ctrl+Z removes the last shape. In a note it undoes typing first, then leaves the empty note.
+            w = OpenOverlay(vk);
+            DragMouse(w, 200, 150, 600, 450);
+            bar = new Point(600 - ToolbarW, 450 + Gap);
+            ToolbarClick(w, bar, 0);
+            DragMouse(w, 240, 190, 340, 260);
+            DragMouse(w, 360, 190, 460, 260);
+            Action ctrlZ = () =>
+            {
+                if (GetForegroundWindow() != w) throw new InvalidOperationException("overlay is not foreground for Ctrl+Z");
+                keybd_event(VK_CONTROL, 0, 0, UIntPtr.Zero);
+                PressKey('Z');
+                keybd_event(VK_CONTROL, 0, 2, UIntPtr.Zero);
+                Pump(200);
+            };
+            ctrlZ();
+            ToolbarClick(w, bar, 4);
+            Click(w, 260, 350);
+            TypeInto(w, "typed");
+            ctrlZ();
+            Check(IsWindowVisible(HotkeyBox(w)) && BoxText(w).Length == 0, "Ctrl+Z in a note undoes the typing, got [" + BoxText(w) + "]");
+            ctrlZ();
+            Check(!IsWindowVisible(HotkeyBox(w)), "Ctrl+Z on an empty note leaves the note");
+            ToolbarClick(w, bar, 8);
+            Check(Closed(w), "Done closes after Ctrl+Z");
+            using (var image = ClipboardImage())
+            {
+                Check(image != null && SameColor(image.GetPixel(40, 75), Color.FromArgb(0xFF, 0x22, 0x22), 40), "Ctrl+Z keeps the earlier shape");
+                Check(image != null && SameColor(image.GetPixel(160, 75), Expected(360, 225)), "Ctrl+Z removes the last shape");
+                Check(image != null && SameColor(image.GetPixel(60, 200), Expected(260, 350)), "the undone note is not in the image");
+            }
+
+            // Ctrl+Y brings back what Ctrl+Z removed, inside a note and for shapes. New work clears what can be redone.
+            w = OpenOverlay(vk);
+            DragMouse(w, 200, 150, 600, 450);
+            bar = new Point(600 - ToolbarW, 450 + Gap);
+            ToolbarClick(w, bar, 0);
+            DragMouse(w, 240, 190, 340, 260);
+            DragMouse(w, 360, 190, 460, 260);
+            Action<char> ctrlKey = letter =>
+            {
+                if (GetForegroundWindow() != w) throw new InvalidOperationException("overlay is not foreground for Ctrl+" + letter);
+                keybd_event(VK_CONTROL, 0, 0, UIntPtr.Zero);
+                PressKey(letter);
+                keybd_event(VK_CONTROL, 0, 2, UIntPtr.Zero);
+                Pump(200);
+            };
+            ctrlKey('Z');
+            ctrlKey('Y');
+            ToolbarClick(w, bar, 4);
+            Click(w, 260, 350);
+            TypeInto(w, "typed");
+            ctrlKey('Z');
+            Check(BoxText(w).Length == 0, "Ctrl+Z empties the note");
+            ctrlKey('Y');
+            Check(BoxText(w) == "typed", "Ctrl+Y restores the typing, got [" + BoxText(w) + "]");
+            ToolbarClick(w, bar, 8);
+            Check(Closed(w), "Done closes after redo");
+            using (var image = ClipboardImage())
+            {
+                Check(image != null && SameColor(image.GetPixel(160, 75), Color.FromArgb(0xFF, 0x22, 0x22), 40), "Ctrl+Y brings the removed shape back");
+                Check(image != null && CountColor(image, Color.FromArgb(0xFF, 0x22, 0x22), new Rectangle(55, 195, 200, 60)) > 20, "the restored note is in the image");
+            }
+
+            w = OpenOverlay(vk);
+            DragMouse(w, 200, 150, 600, 450);
+            ToolbarClick(w, bar, 0);
+            DragMouse(w, 240, 190, 340, 260);
+            ctrlKey('Z');
+            DragMouse(w, 360, 190, 460, 260);
+            ctrlKey('Y');
+            ToolbarClick(w, bar, 8);
+            Check(Closed(w), "Done closes after the cleared redo");
+            using (var image = ClipboardImage())
+                Check(image != null && SameColor(image.GetPixel(40, 75), Expected(240, 225)), "a new shape clears what Ctrl+Y could bring back");
+
             // The pen must be usable before anyone touches the palette or the width buttons.
             w = OpenOverlay(vk);
             DragMouse(w, 100, 100, 300, 300);

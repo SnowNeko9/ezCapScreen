@@ -72,6 +72,7 @@ sealed class Overlay : Form
     readonly Bitmap frozen, dimmed;
     readonly List<ToolButton> buttons = new List<ToolButton>();
     readonly List<Shape> shapes = new List<Shape>();
+    readonly List<Shape> undone = new List<Shape>();
 
     Rectangle? region;
     Tool tool = Tool.None;
@@ -91,7 +92,7 @@ sealed class Overlay : Form
     readonly System.Windows.Forms.Timer caretBlink = new System.Windows.Forms.Timer { Interval = 500 };
     readonly System.Windows.Forms.Timer focusGuard = new System.Windows.Forms.Timer { Interval = 100 };
     Shape editing;
-    bool caretOn;
+    bool caretOn, typingUndone;
 
     public Overlay()
     {
@@ -123,6 +124,7 @@ sealed class Overlay : Form
         textInput.TextChanged += delegate
         {
             editing.Text = textInput.Text;
+            typingUndone = false;
             ShowCaret();
         };
         textInput.KeyUp += delegate { ShowCaret(); };
@@ -243,8 +245,14 @@ sealed class Overlay : Form
     void CommitText()
     {
         if (editing == null) return;
-        if (!editing.IsEmpty) shapes.Add(editing);
+        if (!editing.IsEmpty) AddShape(editing);
         EndEditing();
+    }
+
+    void AddShape(Shape shape)
+    {
+        shapes.Add(shape);
+        undone.Clear();
     }
 
     void RestyleEditing()
@@ -422,6 +430,7 @@ sealed class Overlay : Form
                 {
                     region = fresh;
                     shapes.Clear();
+                    undone.Clear();
                     tool = Tool.None;
                 }
                 break;
@@ -451,7 +460,7 @@ sealed class Overlay : Form
         drag = Drag.None;
         if (finished == Drag.Draw)
         {
-            if (!current.IsEmpty) shapes.Add(current);
+            if (!current.IsEmpty) AddShape(current);
             current = null;
         }
 
@@ -463,6 +472,14 @@ sealed class Overlay : Form
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
+        if (e.KeyData == (Keys.Control | Keys.Z) || e.KeyData == (Keys.Control | Keys.Y))
+        {
+            e.SuppressKeyPress = true;
+            if (e.KeyCode == Keys.Z) UndoKey();
+            else RedoKey();
+            Invalidate();
+            return;
+        }
         if (e.KeyCode != Keys.Escape) return;
         e.SuppressKeyPress = true;
         if (editing != null) EndEditing();
@@ -471,8 +488,41 @@ sealed class Overlay : Form
 
     void Undo()
     {
-        if (editing != null) EndEditing();
-        else if (shapes.Count > 0) shapes.RemoveAt(shapes.Count - 1);
+        if (editing != null)
+        {
+            if (!editing.IsEmpty) undone.Add(editing);
+            EndEditing();
+        }
+        else if (shapes.Count > 0)
+        {
+            undone.Add(shapes[shapes.Count - 1]);
+            shapes.RemoveAt(shapes.Count - 1);
+        }
+    }
+
+    // The text box's own undo flips between undo and redo, so remember which way it last went.
+    void UndoKey()
+    {
+        if (editing == null || textInput.TextLength == 0)
+        {
+            Undo();
+            return;
+        }
+        textInput.Undo();
+        typingUndone = true;
+    }
+
+    void RedoKey()
+    {
+        if (editing != null)
+        {
+            if (typingUndone) textInput.Undo();
+            typingUndone = false;
+            return;
+        }
+        if (undone.Count == 0) return;
+        shapes.Add(undone[undone.Count - 1]);
+        undone.RemoveAt(undone.Count - 1);
     }
 
     Bitmap Flatten()

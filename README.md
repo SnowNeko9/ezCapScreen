@@ -37,7 +37,7 @@ Microsoft Defender flagged version 1.0.0 as `Behavior:Win32/Persistence.A!ml`, m
 
 1. Press `Ctrl+Alt+A`, or click the notification area icon.
 2. Drag over the area you want. To start again, drag somewhere outside the selected area.
-3. To mark up the image, choose a tool on the toolbar, then a size and a color.
+3. To mark up the image, choose a tool on the toolbar, then a size and a color. `Ctrl+Z` removes the last mark, and `Ctrl+Y` brings it back.
 4. To finish, choose one of these:
    - The check mark copies the image to the clipboard.
    - The disk icon saves the image to a file.
@@ -50,7 +50,7 @@ To open **Settings**, right-click the notification area icon.
 ## Add text
 
 1. Choose the **T** tool, then click inside the selected area.
-2. Type your text. `Enter` starts a new line, and `Ctrl+V` pastes.
+2. Type your text. `Enter` starts a new line, `Ctrl+V` pastes, `Ctrl+Z` undoes typing, and `Ctrl+Y` restores it.
 3. Click somewhere else to finish the note.
 
 `Esc` discards the note you are typing. Text does not wrap by itself, and a finished note cannot be edited. To change one, undo it and type it again.
@@ -132,7 +132,7 @@ Microsoft Defender เคยตรวจจับรุ่น 1.0.0 ว่าเ
 
 1. กด `Ctrl+Alt+A` หรือคลิกไอคอนที่ถาดระบบ
 2. ลากเลือกพื้นที่ ถ้าต้องการเลือกใหม่ ให้ลากตรงที่อื่นนอกกรอบ
-3. ถ้าต้องการวาดทับ ให้เลือกเครื่องมือบนแถบเครื่องมือ แล้วเลือกขนาดและสี
+3. ถ้าต้องการวาดทับ ให้เลือกเครื่องมือบนแถบเครื่องมือ แล้วเลือกขนาดและสี กด `Ctrl+Z` เพื่อลบรายการล่าสุด และ `Ctrl+Y` เพื่อเรียกกลับ
 4. เลือกวิธีจบงาน:
    - เครื่องหมายถูก คัดลอกภาพลงคลิปบอร์ด
    - ไอคอนแผ่นดิสก์ บันทึกภาพเป็นไฟล์
