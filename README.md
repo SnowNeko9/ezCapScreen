@@ -39,7 +39,7 @@ Microsoft Defender flagged version 1.0.0 as `Behavior:Win32/Persistence.A!ml`, m
 2. Drag over the area you want. To start again, drag somewhere outside the selected area.
 3. To mark up the image, choose a tool on the toolbar, then a size and a color. `Ctrl+Z` removes the last mark, and `Ctrl+Y` brings it back.
 4. To finish, choose one of these:
-   - The check mark copies the image to the clipboard.
+   - The check mark or `Enter` copies the image to the clipboard.
    - The disk icon saves the image to a file.
    - The X or `Esc` closes without saving.
 
@@ -51,7 +51,7 @@ To open **Settings**, right-click the notification area icon.
 
 1. Choose the **T** tool, then click inside the selected area.
 2. Type your text. `Enter` starts a new line, `Ctrl+V` pastes, `Ctrl+Z` undoes typing, and `Ctrl+Y` restores it.
-3. Click somewhere else to finish the note.
+3. Click somewhere else to finish the note. `Enter` copies the image only after the note is finished.
 
 `Esc` discards the note you are typing. Text does not wrap by itself, and a finished note cannot be edited. To change one, undo it and type it again.
 
@@ -134,7 +134,7 @@ Microsoft Defender เคยตรวจจับรุ่น 1.0.0 ว่าเ
 2. ลากเลือกพื้นที่ ถ้าต้องการเลือกใหม่ ให้ลากตรงที่อื่นนอกกรอบ
 3. ถ้าต้องการวาดทับ ให้เลือกเครื่องมือบนแถบเครื่องมือ แล้วเลือกขนาดและสี กด `Ctrl+Z` เพื่อลบรายการล่าสุด และ `Ctrl+Y` เพื่อเรียกกลับ
 4. เลือกวิธีจบงาน:
-   - เครื่องหมายถูก คัดลอกภาพลงคลิปบอร์ด
+   - เครื่องหมายถูกหรือ `Enter` คัดลอกภาพลงคลิปบอร์ด
    - ไอคอนแผ่นดิสก์ บันทึกภาพเป็นไฟล์
    - เครื่องหมายกากบาทหรือ `Esc` ปิดโดยไม่บันทึก
 

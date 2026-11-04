@@ -480,6 +480,13 @@ sealed class Overlay : Form
             Invalidate();
             return;
         }
+        // In a note, Enter stays with the text box as a new line.
+        if (e.KeyData == Keys.Enter && region.HasValue && editing == null && drag == Drag.None)
+        {
+            e.SuppressKeyPress = true;
+            CopyToClipboard();
+            return;
+        }
         if (e.KeyCode != Keys.Escape) return;
         e.SuppressKeyPress = true;
         if (editing != null) EndEditing();

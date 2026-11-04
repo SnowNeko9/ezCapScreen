@@ -833,6 +833,39 @@ static class Verify
                 Check(image != null && SameColor(image.GetPixel(60, 200), Expected(260, 350)), "the undone note is not in the image");
             }
 
+            // Enter copies like the check mark, except with no selection, in the middle of a drag, or while typing a note.
+            w = OpenOverlay(vk);
+            if (GetForegroundWindow() != w) throw new InvalidOperationException("overlay is not foreground for Enter");
+            PressKey(VK_RETURN);
+            Pump(200);
+            Check(IsWindow(w), "Enter with no selection keeps the overlay open");
+            DragMouse(w, 200, 150, 550, 400);
+            bar = new Point(550 - ToolbarW, 400 + Gap);
+            ToolbarClick(w, bar, 0);
+            Move(w, 400, 200);
+            SendMessage(w, WM_LBUTTONDOWN, new IntPtr(1), LParam(400, 200));
+            Move(w, 500, 260);
+            PressKey(VK_RETURN);
+            Pump(200);
+            Check(IsWindow(w), "Enter during a drag keeps the overlay open");
+            Move(w, 500, 260);
+            SendMessage(w, WM_LBUTTONUP, IntPtr.Zero, LParam(500, 260));
+            ToolbarClick(w, bar, 4);
+            Click(w, 260, 300);
+            TypeInto(w, "ab");
+            PressKey(VK_RETURN);
+            Pump(200);
+            Check(IsWindow(w) && BoxText(w) == "ab\r\n", "Enter in a note starts a new line, got [" + BoxText(w) + "]");
+            ToolbarClick(w, bar, 0);
+            PressKey(VK_RETURN);
+            Check(Closed(w), "Enter closes the overlay");
+            using (var image = ClipboardImage())
+            {
+                Check(image != null && image.Width == 350 && image.Height == 250, "Enter copies the selection, got " + (image == null ? "none" : image.Width + "x" + image.Height));
+                Check(image != null && SameColor(image.GetPixel(200, 80), Color.FromArgb(0xFF, 0x22, 0x22), 40), "Enter keeps the marks in the image");
+                Check(image != null && CountColor(image, Color.FromArgb(0xFF, 0x22, 0x22), new Rectangle(50, 140, 80, 60)) > 0, "Enter keeps the finished note in the image");
+            }
+
             // Ctrl+Y brings back what Ctrl+Z removed, inside a note and for shapes. New work clears what can be redone.
             w = OpenOverlay(vk);
             DragMouse(w, 200, 150, 600, 450);
